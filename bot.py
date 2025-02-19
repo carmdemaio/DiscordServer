@@ -45,7 +45,8 @@ async def on_message(message):
             role = discord.utils.get(message.guild.roles, name=role_name)
             if role:
                 await message.channel.send(
-                    f"{role.mention} 🚨 {message.author} used {emoji}!")
+                    f"<@&ROLE_ID> 🚨 {message.author} used {emoji}!")
+                    #{role.mention} sometimes doesn't send a ping notification. <@&ROLE_ID> always pings everyone in that role.
             else:
                 await message.channel.send(f"⚠️ Role '{role_name}' not found!")
 
