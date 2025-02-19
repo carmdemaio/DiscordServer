@@ -10,6 +10,8 @@ if not TOKEN:
     raise ValueError(
         "❌ ERROR: YOUR_BOT_TOKEN_HERE is not set in Replit Secrets!")
 
+intents = discord.Intents.default()
+intents.message_content = True  # Required for reading messages
 bot = discord.Client(intents=intents)
 
 # Define emoji-to-role mappings (You can expand this)
