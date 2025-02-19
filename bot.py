@@ -1,26 +1,43 @@
 import discord
 from discord.ext import commands
+import os
 
-TOKEN = "YOUR_BOT_TOKEN_HERE"  # Replace with your bot's token
-TARGET_EMOJI = "🔥"  # Replace with the emoji you want to trigger the ping
+# Load the bot token from Replit Secrets
+TOKEN = os.getenv(
+    "YOUR_BOT_TOKEN_HERE")  # Fetch token from Replit Secrets Vault
+print(f"🔑 Loaded token: {TOKEN[:5]}********")
+if not TOKEN:
+    raise ValueError(
+        "❌ ERROR: YOUR_BOT_TOKEN_HERE is not set in Replit Secrets!")
 
-intents = discord.Intents.default()
-intents.messages = True
-intents.guilds = True
-intents.message_content = True  # Required for reading messages
+bot = discord.Client(intents=intents)
 
-bot = commands.Bot(command_prefix="!", intents=intents)
+# Define emoji-to-role mappings (You can expand this)
+EMOJI_ROLE_MAP = {
+    "🐋": "Sea of Thieves",  # Whale emoji -> Sea of Thieves role
+    "🦗": "Helldivers",      # Eagle emoji -> Helldivers role
+    "🧟": "Day Z",           # Zombie emoji -> Day Z role
+    "🗺️": "Civ"              # Map emoji -> Civilization role
+}
 
 @bot.event
 async def on_ready():
-    print(f"Logged in as {bot.user}")
+    print(f"✅ Bot is online as {bot.user}")
 
 @bot.event
 async def on_message(message):
+    # Ignore bot messages
     if message.author.bot:
-        return  # Ignore bot messages
-
-    if TARGET_EMOJI in message.content:
-        await message.channel.send(f"@everyone 🚨 {message.author} used {TARGET_EMOJI}!")
+        return
+    
+    # Check for emojis in message
+    for emoji, role_name in EMOJI_ROLE_MAP.items():
+        if emoji in message.content:
+            # Find the role in the server
+            role = discord.utils.get(message.guild.roles, name=role_name)
+            if role:
+                await message.channel.send(f"{role.mention} 🚨 {message.author} used {emoji}!")
+            else:
+                await message.channel.send(f"⚠️ Role '{role_name}' not found!")
 
 bot.run(TOKEN)
